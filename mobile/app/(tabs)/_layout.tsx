@@ -1,4 +1,4 @@
-
+import COLORS from '../theme';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
@@ -10,7 +10,7 @@ type FontAwesomeIconName =
     | "line-chart"
     | "home"
     | "fire"
-    | "bell";
+    | "bell-slash";
 
 type TabConfig = {
     name: string;
@@ -23,7 +23,7 @@ const TAB_CONFIG: TabConfig[] = [
     { name: 'Analytics', label: 'Analytics', icon: 'line-chart' },
     { name: 'index', label: 'Home', icon: 'home' },
     { name: 'Streaks', label: 'Streaks', icon: 'fire' },
-    { name: 'DistractionTracking', label: 'Distractions', icon: 'bell' },
+    { name: 'DistractionTracking', label: 'Distractions', icon: 'bell-slash' },
 ];
 
 function CustomTabBar({ state, navigation }: any) {
@@ -48,7 +48,7 @@ function CustomTabBar({ state, navigation }: any) {
                                     <FontAwesome
                                         name={config?.icon || 'circle'}
                                         size={isFocused ? 30 : 24}
-                                        color="#fff"
+                                        color="#111827"
                                         style={isFocused ? styles.activeIcon : undefined}
                                     />
                                 </View>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     },
     tabBar: {
         flexDirection: 'row',
-        backgroundColor: '#2b1e40ff',
+        backgroundColor: COLORS.cardBackgroundColor,
         width: '100%',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -111,19 +111,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 50,
         marginHorizontal: 2,
-        backgroundColor: '#2b1e40ff',
     },
     tabBorder: {
         backgroundColor: 'transparent',
-        borderRadius: "100%",
     },
     activeTab: {
-        paddingVertical: 16,
+        paddingVertical: 17,
+        borderRadius: 50,
         paddingHorizontal: 15,
-        backgroundColor: '#6200ff',
+        backgroundColor: COLORS.accentColor,
     },
     activeTabBorder: {
-        backgroundColor: '#2b1e40ff',
+        backgroundColor: COLORS.cardBackgroundColor,
         borderRadius: 50,
         width: 95,
         position: 'absolute',
