@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
 import taskRoutes from './routes/taskRoutes';
 import sessionRoutes from './routes/sessionRoutes';
 import distractionRoutes from './routes/distractionRoutes';
@@ -28,6 +29,7 @@ app.use('/api/sessions', sessionRoutes);
 app.use('/api/distractions', distractionRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/streaks', streakRoutes);
+app.use('/api/users', userRoutes);
 
 app.use(errorHandler);
 
