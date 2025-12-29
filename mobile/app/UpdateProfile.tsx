@@ -1,27 +1,34 @@
 import {
-    Text,
     View,
-    Image,
-    StyleSheet,
-    TextInput,
+    Text,
     TouchableOpacity,
-    Alert
+    StyleSheet,
+    Image,
+    TextInput,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { FontAwesome } from '@expo/vector-icons';
 import React, { useState } from 'react'
-import { Link, router } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { router, useLocalSearchParams } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker';
 import COLORS from './theme'
 import { useAuth } from '@/context/AuthContext';
 
-const Signup = () => {
-    const [fullName, setFullName] = useState('');
-    const [email, setEmail] = useState('');
+const UpdateProfile = () => {
+    const params = useLocalSearchParams();
+    const [fullName, setFullName] = useState(params.fullname ? String(params.fullname) : '');
+    const [email, setEmail] = useState(params.email ? String(params.email) : '');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [imageUri, setImageUri] = useState<string | null>(null);
-    const { signup, user } = useAuth();
+    const [imageUri, setImageUri] = useState<string | null>(params.profilePictureUrl ? String(params.profilePictureUrl) : null);
+    const { updateProfile } = useAuth();
+    const [updating, setUpdating] = useState(false);
+
+    // Store initial values for change detection
+    const initialFullName = params.fullname ? String(params.fullname) : '';
+    const initialEmail = params.email ? String(params.email) : '';
+    const initialImageUri = params.profilePictureUrl ? String(params.profilePictureUrl) : null;
 
     const pickImage = async () => {
         // Ask for permission
@@ -43,25 +50,47 @@ const Signup = () => {
         }
     };
 
-    const handleSignUp = async () => {
-        const profilePictureUrl = imageUri ? imageUri : undefined;
-        const response = await signup({ fullname: fullName, email, password, profilePictureUrl });
+    const handleUpdateProfile = async () => {
 
-        if (!response.success) {
-            Alert.alert('Sign Up Failed', response.error || 'An error occurred during sign up.');
+        try {
+            setUpdating(true);
+            const response = await updateProfile({
+                fullname: fullName,
+                email: email,
+                profilePictureUrl: imageUri || undefined,
+                ...(password ? { password } : {}),
+            });
+            if (!response.success) {
+                alert(response.error || 'Profile update failed');
+                setUpdating(false);
+                return;
+            }
+            router.replace('/(tabs)');
+            setUpdating(false);
+        }
+        catch (error) {
+            console.error('Profile update failed:', error);
+            setUpdating(false);
             return;
         }
-        router.replace('/(tabs)');
+
     }
 
-    if (user) {
-        router.replace('/(tabs)');
-    }
+    // Check if any field has changed
+    const isChanged =
+        fullName !== initialFullName ||
+        email !== initialEmail ||
+        password.length > 0 ||
+        confirmPassword.length > 0 ||
+        imageUri !== initialImageUri;
+
+    // Passwords must match if either is filled
+    const passwordMismatch = (password.length > 0 || confirmPassword.length > 0) && password !== confirmPassword;
 
     return (
-        <SafeAreaView style={{ flex: 1, alignItems: 'center', gap: 40 }}>
+        <SafeAreaView style={{ flex: 1, alignItems: 'center', gap: 15 }}>
             {/* Logo */}
-            <Text style={styles.heading}>Create Account</Text>
+            <Text style={styles.heading}>Update Profile</Text>
 
             {/* Inputs */}
             <View>
@@ -69,7 +98,10 @@ const Signup = () => {
                 <View style={{ alignItems: 'center', marginBottom: 10 }}>
                     <TouchableOpacity onPress={pickImage} style={styles.imageWrapper}>
                         {imageUri ? (
-                            <Image source={{ uri: imageUri }} style={styles.image} />
+                            <View style={{ flex: 1, width: '100%', height: '100%', position: 'relative' }}>
+                                <Image source={{ uri: imageUri }} style={styles.image} />
+                                <Text style={{ position: 'absolute', bottom: 0, color: '#fff', fontWeight: 'bold', backgroundColor: 'rgba(0,0,0,0.5)', width: '100%', height: '100%', textAlign: 'center', lineHeight: 150 }}>Change Photo</Text>
+                            </View>
                         ) : (
                             <View style={styles.placeholder}>
                                 <Text style={styles.placeholderText}>Add Photo</Text>
@@ -96,12 +128,12 @@ const Signup = () => {
                     />
                 </View>
                 <View>
-                    <Text style={styles.label}>Password</Text>
+                    <Text style={styles.label}>New Password (optional)</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <TextInput
                             value={password}
                             onChangeText={(password) => setPassword(password)}
-                            placeholder="Enter your password"
+                            placeholder="Enter new password"
                             style={[styles.input, { flex: 1 }]}
                             secureTextEntry={!showPassword}
                         />
@@ -118,26 +150,44 @@ const Signup = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
+                <View>
+                    <Text style={styles.label}>Confirm Password (optional)</Text>
+                    <TextInput
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                        placeholder="Confirm new password"
+                        style={styles.input}
+                        secureTextEntry={!showPassword}
+                    />
+                    {passwordMismatch && (
+                        <Text style={{ color: 'red', fontSize: 13, marginTop: 2 }}>Passwords do not match</Text>
+                    )}
+                </View>
             </View>
 
             {/* Actions */}
             <View>
                 <TouchableOpacity
-                    onPress={() => handleSignUp()}
-                    style={styles.button}
+                    onPress={handleUpdateProfile}
+                    style={[styles.button, (!isChanged || passwordMismatch) && { opacity: 0.5 }]}
+                    disabled={!isChanged || passwordMismatch}
                 >
-                    <Text style={{ color: '#fff', fontWeight: '600', textAlign: 'center' }}>Sign Up</Text>
+                    <Text style={{ color: '#fff', fontWeight: '600', textAlign: 'center' }}>
+                        {updating ? 'Updating...' : 'Update Profile'}
+                    </Text>
                 </TouchableOpacity>
-                <Text style={{ marginTop: 10, fontSize: 16, textAlign: 'center' }}>
-                    Already have an account?
-                    <Link href={"../Login"} style={styles.link}> Login</Link>
-                </Text>
+                <TouchableOpacity
+                    onPress={() => router.replace('/(tabs)')}
+                    style={[styles.button, { backgroundColor: COLORS.default, marginTop: 10 }]}
+                >
+                    <Text style={{ color: '#fff', fontWeight: '600', textAlign: 'center' }}>Cancel</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     )
 }
 
-export default Signup
+export default UpdateProfile
 
 const styles = StyleSheet.create({
     heading: {
@@ -153,7 +203,7 @@ const styles = StyleSheet.create({
         borderRadius: 75,
         overflow: 'hidden',
         borderWidth: 2,
-        borderColor: '#ffffff',
+        borderColor: COLORS.accent,
         alignItems: 'center',
         justifyContent: 'center',
     },

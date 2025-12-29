@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     },
     tabBar: {
         flexDirection: 'row',
-        backgroundColor: COLORS.cardBackgroundColor,
+        backgroundColor: COLORS.cardBg,
         width: '100%',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -119,10 +119,10 @@ const styles = StyleSheet.create({
         paddingVertical: 17,
         borderRadius: 50,
         paddingHorizontal: 15,
-        backgroundColor: COLORS.accentColor,
+        backgroundColor: COLORS.accent,
     },
     activeTabBorder: {
-        backgroundColor: COLORS.cardBackgroundColor,
+        backgroundColor: COLORS.cardBg,
         borderRadius: 50,
         width: 95,
         position: 'absolute',

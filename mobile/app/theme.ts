@@ -1,9 +1,11 @@
 // mobile/app/theme.ts
 const COLORS = {
-    backgroundColor: "#FFFFFF",
-    cardBackgroundColor: "#D5D5D5",
-    textColor: "#111827",
-    accentColor: "#6e2085",
+    bg: "#FFFFFF",
+    cardBg: "#e0e0e0ff",
+    primary: "#6200EE",
+    default: "#292929ff",
+    text: "#111827",
+    accent: "#6e2085",
     danger: "#FF3B30",
 };
 

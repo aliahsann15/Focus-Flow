@@ -139,12 +139,12 @@ const styles = StyleSheet.create({
     link: {
         marginTop: 5,
         paddingHorizontal: 5,
-        color: COLORS.accentColor,
+        color: COLORS.accent,
         textAlign: 'left',
         width: 300
     },
     button: {
-        backgroundColor: COLORS.accentColor,
+        backgroundColor: COLORS.accent,
         padding: 15,
         borderRadius: 5,
         marginTop: 30,

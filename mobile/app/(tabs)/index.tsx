@@ -71,13 +71,23 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={{ width: "100%", minHeight: "100%", paddingHorizontal: 20 }} contentContainerStyle={{ alignItems: "flex-start", gap: 20, paddingVertical: 20 }}>
-        
+
         {/* Profile Pic & Name, Email */}
         <View style={[styles.card, { position: "relative", width: "100%" }]}>
           {/* Edit Profile Icon (top-right) */}
           <View style={{ position: "absolute", top: 10, right: 10, zIndex: 2 }}>
-            <TouchableOpacity onPress={() => {/* TODO: Navigate to edit profile */ }} hitSlop={10}>
-              <FontAwesome name="pencil" size={24} color={COLORS.accentColor} />
+            <TouchableOpacity onPress={() => {
+                router.replace({
+                  pathname: "/UpdateProfile",
+                  params: {
+                    fullname: userData?.fullname,
+                    email: userData?.email,
+                    profilePictureUrl: userData?.profilePictureUrl || "",
+                  },
+                });
+              }}
+              hitSlop={10}>
+              <FontAwesome name="pencil" size={24} color={COLORS.accent} />
             </TouchableOpacity>
           </View>
           {/* Logout Icon (bottom-right) */}
@@ -87,8 +97,8 @@ export default function Index() {
             </TouchableOpacity>
           </View>
           {/*  */}
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-start", paddingVertical: 10 }}>
-            <Image source={images.logo} style={styles.profileImage} />
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-start", gap: 10, paddingVertical: 10 }}>
+            <Image source={userData?.profilePictureUrl ? { uri: userData.profilePictureUrl } : images.defaultProfile} style={styles.profileImage} />
             <View style={{ maxWidth: "70%" }}>
               <Text style={{ fontSize: 22, fontWeight: "600" }}>Hi! {userData?.fullname}</Text>
               <Text>{userData?.email}</Text>
@@ -97,9 +107,9 @@ export default function Index() {
         </View>
 
         {/* Home Dashboard Cards & Widgets */}
-        
+
         {/* Streak Counter Widget */}
-        <View style={[styles.card, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f9f6e7' }]}> 
+        <View style={[styles.card, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f9f6e7' }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <FontAwesome name="fire" size={24} color="#ff9800" style={{ marginRight: 8 }} />
             <Text style={{ fontSize: 18, fontWeight: '600' }}>Streak</Text>
@@ -110,33 +120,33 @@ export default function Index() {
         {/* Today's Focus Time Card */}
         <View style={styles.card}>
           <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 6 }}>Today&apos;s Focus Time</Text>
-          <Text style={{ fontSize: 32, fontWeight: "bold", color: COLORS.accentColor }}>1h 45m</Text>
+          <Text style={{ fontSize: 32, fontWeight: "bold", color: COLORS.accent }}>1h 45m</Text>
           {/* Daily Progress Bar Widget */}
           <View style={{ marginTop: 10, marginBottom: 4 }}>
             <View style={{ height: 12, backgroundColor: '#eee', borderRadius: 6, overflow: 'hidden' }}>
-              <View style={{ width: '70%', height: '100%', backgroundColor: COLORS.accentColor, borderRadius: 6 }} />
+              <View style={{ width: '70%', height: '100%', backgroundColor: COLORS.accent, borderRadius: 6 }} />
             </View>
             <Text style={{ fontSize: 12, color: '#888', marginTop: 2 }}>70% of daily goal</Text>
           </View>
         </View>
 
         {/* Active Task Summary Card */}
-        <View style={styles.card}>
+        <View style={[styles.card, { minHeight: 200 }]}>
           <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 6 }}>Active Task Summary</Text>
-          <Text style={{ fontSize: 16, color: COLORS.accentColor, marginBottom: 2 }}>Task: Deep Work Session</Text>
+          <Text style={{ fontSize: 16, color: COLORS.accent, marginBottom: 2 }}>Task: Deep Work Session</Text>
           <Text style={{ fontSize: 14, color: '#888' }}>Time Remaining: 25m</Text>
         </View>
 
         {/* Quick Start Focus Button Card */}
-        <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}> 
+        <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
           <TouchableOpacity style={
-            [styles.card, 
-            { flexDirection: 'row',  alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.accentColor, padding: 12 }]
-            } onPress={() => { /* TODO: Start focus session */ }}>
+            [styles.card,
+            { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.accent, padding: 12 }]
+          } onPress={() => { /* TODO: Start focus session */ }}>
             <FontAwesome name="play-circle" size={28} color="#fff" style={{ marginRight: 10 }} />
             <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>
               Quick Start Focus
-              </Text>
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -155,7 +165,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: "100%",
-    backgroundColor: COLORS.cardBackgroundColor,
+    backgroundColor: COLORS.cardBg,
     borderRadius: 10,
     padding: 10,
     shadowColor: "#000",
