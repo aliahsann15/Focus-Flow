@@ -4,15 +4,46 @@ import {
     Image,
     StyleSheet,
     TextInput,
-    TouchableOpacity
+    TouchableOpacity,
+    Alert
 } from 'react-native'
-import React from 'react'
-import { Link } from 'expo-router'
+import { FontAwesome } from '@expo/vector-icons';
+import React, { useEffect } from 'react'
+import { Link, router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { images } from '@/constants/images'
+import { useAuth } from '@/context/AuthContext';
 import COLORS from './theme'
 
 const Login = () => {
+    const [password, setPassword] = React.useState('');
+    const [email, setEmail] = React.useState('');
+    const [showPassword, setShowPassword] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const { login, user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            router.replace('/(tabs)');
+        }
+    }, [user]);
+
+    const handleLogin = async () => {
+        setIsLoading(true);
+
+        const response = await login(email, password);
+
+        if (!response.success) {
+            Alert.alert('Login Failed', response.error || 'An error occurred during login.');
+            setIsLoading(false);
+            return;
+        }
+        router.replace('/(tabs)');
+        setIsLoading(false);
+    }
+
+
+
     return (
         <SafeAreaView style={{ flex: 1, alignItems: 'center', gap: 40 }}>
             {/* Logo */}
@@ -24,25 +55,47 @@ const Login = () => {
                 <View>
                     <Text style={styles.label}>Email</Text>
                     <TextInput
+                        value={email}
+                        onChangeText={(text) => setEmail(text)}
                         placeholder="abc@example.com"
                         style={styles.input}
                     />
                 </View>
                 <View>
                     <Text style={styles.label}>Password</Text>
-                    <TextInput
-                        placeholder="Enter your password"
-                        style={styles.input}
-                        secureTextEntry={true}
-                    />
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TextInput
+                            value={password}
+                            onChangeText={(text) => setPassword(text)}
+                            placeholder="Enter your password"
+                            style={[styles.input, { flex: 1 }]}
+                            secureTextEntry={!showPassword}
+                        />
+                        <TouchableOpacity
+                            onPress={() => setShowPassword((prev) => !prev)}
+                            style={{ position: 'absolute', right: 10 }}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                            <FontAwesome
+                                name={showPassword ? 'eye-slash' : 'eye'}
+                                size={20}
+                                color="#888"
+                            />
+                        </TouchableOpacity>
+                    </View>
                 </View>
                 <Link href={"/"} style={styles.link}>Forgot Password?</Link>
             </View>
 
             {/* Actions */}
             <View>
-                <TouchableOpacity style={styles.button}>
-                    <Text style={{ color: '#fff', fontWeight: '600', textAlign: 'center' }}>Login</Text>
+                <TouchableOpacity
+                    onPress={handleLogin}
+                    style={styles.button}
+                >
+                    <Text style={{ color: '#fff', fontWeight: '600', textAlign: 'center' }}>
+                        {isLoading ? 'Logging In...' : 'Login'}
+                    </Text>
                 </TouchableOpacity>
                 <Text style={{ marginTop: 10, fontSize: 16 }}>
                     Don&apos;t have an account?
