@@ -1,9 +1,19 @@
-import { Schema, model, Model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
-export interface IUser {
-    fullname: string;
+export interface IUserSettings {
+    focusDuration: number;
+    shortBreakDuration: number;
+    longBreakDuration: number;
+    notificationsEnabled: boolean;
+    theme: string;
+}
+
+export interface IUser extends Document {
+    name: string;
     email: string;
     passwordHash: string;
+    timezone: string;
+    settings: IUserSettings;
     profilePictureUrl?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -11,14 +21,20 @@ export interface IUser {
 
 const UserSchema = new Schema<IUser>(
     {
-        fullname: { type: String, required: true },
+        name: { type: String, required: true },
         email: { type: String, required: true, unique: true },
         passwordHash: { type: String, required: true },
+        timezone: { type: String, default: 'UTC' },
+        settings: {
+            focusDuration: { type: Number, default: 25 },
+            shortBreakDuration: { type: Number, default: 5 },
+            longBreakDuration: { type: Number, default: 15 },
+            notificationsEnabled: { type: Boolean, default: true },
+            theme: { type: String, default: 'light' },
+        },
         profilePictureUrl: { type: String },
     },
     { timestamps: true }
 );
 
-const UserModel: Model<IUser> = model<IUser>('User', UserSchema);
-
-export default UserModel;
+export default model<IUser>('User', UserSchema);
